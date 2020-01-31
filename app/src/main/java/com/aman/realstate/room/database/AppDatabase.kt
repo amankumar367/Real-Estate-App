@@ -7,8 +7,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.aman.realstate.data.pojo.RealEState
 import com.aman.realstate.room.dao.EStateDao
+import com.aman.realstate.room.entity.Options
 
-@Database(entities = [RealEState.Facility.Option::class], version = 1, exportSchema = false)
+@Database(entities = [Options::class], version = 1, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun eStateDao(): EStateDao

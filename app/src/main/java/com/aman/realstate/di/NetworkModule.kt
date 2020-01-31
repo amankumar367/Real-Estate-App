@@ -1,5 +1,6 @@
 package com.aman.realstate.di
 
+import com.aman.realstate.network.ApiInterface
 import com.aman.realstate.utils.ApiConstants
 import dagger.Module
 import dagger.Provides
@@ -19,5 +20,11 @@ class NetworkModule {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiInterface(retrofit: Retrofit): ApiInterface  {
+        return retrofit.create(ApiInterface::class.java)
     }
 }

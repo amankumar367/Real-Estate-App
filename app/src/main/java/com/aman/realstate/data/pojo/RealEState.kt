@@ -1,8 +1,6 @@
 package com.aman.realstate.data.pojo
 
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
 data class RealEState(
@@ -19,18 +17,11 @@ data class RealEState(
         @SerializedName("options")
         val options: List<Option?>?
     ) {
-
-        @Entity(tableName = "option")
         data class Option(
-            @ColumnInfo(name = "icon")
             @SerializedName("icon")
             val icon: String?,
-
-            @ColumnInfo(name = "id")
             @SerializedName("id")
             val id: String?,
-
-            @ColumnInfo(name = "name")
             @SerializedName("name")
             val name: String?
         )
