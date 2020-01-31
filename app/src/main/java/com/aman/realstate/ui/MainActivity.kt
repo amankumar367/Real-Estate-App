@@ -1,9 +1,10 @@
-package com.aman.realstate
+package com.aman.realstate.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.aman.realstate.R
+import dagger.android.support.DaggerAppCompatActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : DaggerAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
