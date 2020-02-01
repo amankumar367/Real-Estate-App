@@ -79,6 +79,7 @@ dependencies {
     // Stetho
     def vStetho = '1.5.1'
     implementation "com.facebook.stetho:stetho:$vStetho"
+    implementation "com.facebook.stetho:stetho-okhttp3:$vStetho"
 
     // Material Desing
     def vMaterial = '1.0.0'

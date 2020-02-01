@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 data class RealEState(
     @SerializedName("exclusions")
-    val exclusions: List<Any?>?,
+    val exclusions: List<Any?>? = listOf(),
     @SerializedName("facilities")
-    val facilities: List<Facility?>?
+    val facilities: List<Facility?>? = listOf()
 ) {
     data class Facility(
         @SerializedName("facility_id")
@@ -15,7 +15,7 @@ data class RealEState(
         @SerializedName("name")
         val name: String?,
         @SerializedName("options")
-        val options: List<Option?>?
+        val options: List<Option?>? = listOf()
     ) {
         data class Option(
             @SerializedName("icon")

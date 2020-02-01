@@ -11,7 +11,7 @@ import retrofit2.Response
 
 class EStateRepo(
     private val apiInterface: ApiInterface,
-    private val appDatabase: AppDatabase): EStateRepoI {
+    private val db: AppDatabase): EStateRepoI {
 
     override fun getData(): Single<RealEState> {
         return Single.create<RealEState> { emitter ->
