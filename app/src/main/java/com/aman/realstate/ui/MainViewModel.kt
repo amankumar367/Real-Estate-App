@@ -25,7 +25,7 @@ class MainViewModel(private val repo: EStateRepoI): ViewModel() {
         state = state.copy(loading = true)
 
         compositeDisposable.add(
-            repo.getData()
+            repo.getData("Network")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

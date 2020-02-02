@@ -1,8 +1,8 @@
 package com.aman.realstate.data.repo
 
-import com.aman.realstate.data.pojo.RealEState
+import com.aman.realstate.room.entity.EState
 import io.reactivex.Single
 
 interface EStateRepoI {
-    fun getData(): Single<RealEState>
+    fun getData(key: String): Single<EState>
 }

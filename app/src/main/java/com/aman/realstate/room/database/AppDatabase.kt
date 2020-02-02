@@ -5,11 +5,17 @@ import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.aman.realstate.data.pojo.RealEState
 import com.aman.realstate.room.dao.EStateDao
-import com.aman.realstate.room.entity.Options
+import com.aman.realstate.room.entity.*
 
-@Database(entities = [Options::class], version = 1, exportSchema = false)
+@Database(entities = [
+    Facility::class,
+    Option::class,
+    Exclusions::class
+], version = 1, exportSchema = false)
+@TypeConverters(ExclusionTypeConvertor::class)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun eStateDao(): EStateDao

@@ -1,11 +1,11 @@
 package com.aman.realstate.data.pojo
 
-
+import com.aman.realstate.room.entity.Exclusion
 import com.google.gson.annotations.SerializedName
 
 data class RealEState(
     @SerializedName("exclusions")
-    val exclusions: List<Any?>? = listOf(),
+    val exclusions: List<List<Exclusion>?>? = listOf(),
     @SerializedName("facilities")
     val facilities: List<Facility?>? = listOf()
 ) {
