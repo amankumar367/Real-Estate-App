@@ -20,12 +20,12 @@ class MainViewModel(private val repo: EStateRepoI): ViewModel() {
             publishState(value)
         }
 
-    fun getData() {
+    fun getData(key: String) {
         Log.d(TAG, " >>> Receive call for fetching all data")
         state = state.copy(loading = true)
 
         compositeDisposable.add(
-            repo.getData("Network")
+            repo.getData(key)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
