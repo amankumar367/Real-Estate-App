@@ -11,9 +11,7 @@ import com.aman.realstate.databinding.ActivityMainBinding
 import com.aman.realstate.extensions.createFactory
 import com.aman.realstate.extensions.setIcon
 import com.aman.realstate.extensions.showToast
-import com.aman.realstate.room.entity.EState
-import com.aman.realstate.room.entity.Facility
-import com.aman.realstate.room.entity.Option
+import com.aman.realstate.room.entity.*
 import com.aman.realstate.utils.ApiConstants
 import com.google.android.material.chip.Chip
 import dagger.android.support.DaggerAppCompatActivity
@@ -30,6 +28,8 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private var mState: EState? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -38,6 +38,7 @@ class MainActivity : DaggerAppCompatActivity() {
         setObserver()
         loadData()
         onClick()
+        chipOnCheckedListener()
     }
 
     private fun init() {
@@ -72,7 +73,76 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    private fun chipOnCheckedListener() {
+        cg_propery_type.setOnCheckedChangeListener { chipGroup, id ->
+            if (id > 0) {
+                val chip: Chip = chipGroup.findViewById(id)
+
+                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
+                setAlphaForExclusions(ids)
+                showToast(chip.text.toString())
+            }
+        }
+
+        cg_rooms.setOnCheckedChangeListener { chipGroup, id ->
+            if (id > 0) {
+                val chip: Chip = chipGroup.findViewById(id)
+
+                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
+                setAlphaForExclusions(ids)
+                showToast(chip.text.toString())
+            }
+        }
+
+        cg_other_facilities.setOnCheckedChangeListener { chipGroup, id ->
+            if (id > 0) {
+                val chip: Chip = chipGroup.findViewById(id)
+
+                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
+                setAlphaForExclusions(ids)
+                showToast(chip.text.toString())
+            }
+        }
+    }
+
+    private fun setAlphaForExclusions(ids: List<String>) {
+        mState?.let {
+            var foundList: List<Exclusion>? = null
+            it.exclusions.forEach { exclusions ->
+                var isFound = false
+                exclusions.exclusions.forEach { exclusion ->
+                    if (exclusion.facility_id.toString() == ids[0]
+                        && exclusion.options_id.toString() == ids[1]) {
+                        isFound = true
+                        return@forEach
+                    }
+                }
+
+                if (isFound) {
+                    foundList = exclusions.exclusions
+                    return@forEach
+                }
+            }
+            Log.d(TAG, "Searching ids: $ids & Found list : $foundList")
+        }
+    }
+
+    private fun getOptionIDAndFacilitiesID(optionName: String): List<String> {
+        val list = mutableListOf<String>()
+        mState?.let {
+            it.options.forEach { option ->
+                if (optionName == option.name) {
+                    list += option.facilityId!!
+                    list += option.id!!
+                    return@forEach
+                }
+            }
+        }
+        return list
+    }
+
     private fun setData(data: EState) {
+        mState = data
         setOptions(data.options, data.facilities)
     }
 
@@ -80,34 +150,23 @@ class MainActivity : DaggerAppCompatActivity() {
         options.forEach {
             val chip =
                 layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+            chip.setPadding(0, 0, 60, 0)
 
             if (it.facilityId == facility[0].facilityId!!) {
                 chip.text = it.name
                 chip.setIcon(it.icon)
-
-                chip.setPadding(0, 0, 60, 0)
-
-                chip.setOnCheckedChangeListener { compoundButton, b -> }
                 cg_propery_type.addView(chip)
             }
 
             if (it.facilityId == facility[1].facilityId!!) {
                 chip.text = it.name
                 chip.setIcon(it.icon)
-
-                chip.setPadding(0, 0, 60, 0)
-
-                chip.setOnCheckedChangeListener { compoundButton, b -> }
                 cg_rooms.addView(chip)
             }
 
             if (it.facilityId == facility[2].facilityId!!) {
                 chip.text = it.name
                 chip.setIcon(it.icon)
-
-                chip.setPadding(0, 0, 60, 0)
-
-                chip.setOnCheckedChangeListener { compoundButton, b -> }
                 cg_other_facilities.addView(chip)
             }
 
