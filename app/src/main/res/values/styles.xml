@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Colors_Widget.MaterialComponents.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@drawable/chip_bg</item>
+        <item name="chipStrokeColor">@color/colorAccent</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:tint">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
 </resources>

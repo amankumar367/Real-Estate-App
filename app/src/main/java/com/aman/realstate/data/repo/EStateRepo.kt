@@ -27,15 +27,24 @@ class EStateRepo(
     override fun getData(key: String): Single<EState> {
         return Single.create { emitter ->
             if (rateLimit.shouldFetch(key)) {
-                val response = apiInterface.getResponse().execute()
-                if (response.isSuccessful) {
+                try {
                     Log.d(TAG, " >>> Fetching data from network")
-                    response.body()?.let {
-                        emitter.onSuccess(fetchAndStore(it))
+                    db.eStateDao().deleteAllExclusions()
+                    db.eStateDao().deleteAllFacilities()
+                    db.eStateDao().deleteAllOptions()
+
+                    val response = apiInterface.getResponse().execute()
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            emitter.onSuccess(fetchAndStore(it))
+                        }
+                    } else {
+                        rateLimit.reset(key)
+                        emitter.onError(Exception("Failed to fetch data from remote"))
                     }
-                } else {
+                } catch (exception: Exception) {
                     rateLimit.reset(key)
-                    emitter.onError(Exception("Failed to fetch data from remote"))
+                    emitter.onError(exception)
                 }
             } else {
                 try {

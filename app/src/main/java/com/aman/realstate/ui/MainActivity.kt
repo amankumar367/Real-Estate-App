@@ -9,9 +9,17 @@ import com.aman.realstate.R
 import com.aman.realstate.data.repo.EStateRepoI
 import com.aman.realstate.databinding.ActivityMainBinding
 import com.aman.realstate.extensions.createFactory
+import com.aman.realstate.extensions.setIcon
+import com.aman.realstate.extensions.showToast
+import com.aman.realstate.room.entity.EState
+import com.aman.realstate.room.entity.Facility
+import com.aman.realstate.room.entity.Option
 import com.aman.realstate.utils.ApiConstants
+import com.google.android.material.chip.Chip
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
+
 
 class MainActivity : DaggerAppCompatActivity() {
 
@@ -29,6 +37,7 @@ class MainActivity : DaggerAppCompatActivity() {
         init()
         setObserver()
         loadData()
+        onClick()
     }
 
     private fun init() {
@@ -45,16 +54,64 @@ class MainActivity : DaggerAppCompatActivity() {
         })
     }
 
+    private fun loadData() {
+        viewModel.getData(ApiConstants.NETWORK_CALL)
+    }
+
     private fun updateView(state: MainState) {
-        when {
-            state.loading -> {}
-            state.success -> {}
-            state.failure -> {}
+        if (state.success) setData(state.data!!)
+    }
+
+    private fun onClick() {
+        btn_search.setOnClickListener {
+            showToast("Search successful")
+        }
+
+        btn_retry.setOnClickListener {
+           loadData()
         }
     }
 
-    private fun loadData() {
-        viewModel.getData(ApiConstants.NETWORK_CALL)
+    private fun setData(data: EState) {
+        setOptions(data.options, data.facilities)
+    }
+
+    private fun setOptions(options: List<Option>, facility: List<Facility>) {
+        options.forEach {
+            val chip =
+                layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
+
+            if (it.facilityId == facility[0].facilityId!!) {
+                chip.text = it.name
+                chip.setIcon(it.icon)
+
+                chip.setPadding(0, 0, 60, 0)
+
+                chip.setOnCheckedChangeListener { compoundButton, b -> }
+                cg_propery_type.addView(chip)
+            }
+
+            if (it.facilityId == facility[1].facilityId!!) {
+                chip.text = it.name
+                chip.setIcon(it.icon)
+
+                chip.setPadding(0, 0, 60, 0)
+
+                chip.setOnCheckedChangeListener { compoundButton, b -> }
+                cg_rooms.addView(chip)
+            }
+
+            if (it.facilityId == facility[2].facilityId!!) {
+                chip.text = it.name
+                chip.setIcon(it.icon)
+
+                chip.setPadding(0, 0, 60, 0)
+
+                chip.setOnCheckedChangeListener { compoundButton, b -> }
+                cg_other_facilities.addView(chip)
+            }
+
+        }
     }
 
     companion object {

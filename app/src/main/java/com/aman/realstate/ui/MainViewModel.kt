@@ -22,7 +22,7 @@ class MainViewModel(private val repo: EStateRepoI): ViewModel() {
 
     fun getData(key: String) {
         Log.d(TAG, " >>> Receive call for fetching all data")
-        state = state.copy(loading = true)
+        state = state.copy(loading = true, success = false, failure=false)
 
         compositeDisposable.add(
             repo.getData(key)

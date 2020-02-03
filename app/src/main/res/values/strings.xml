@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Radius App</string>
+    <string name="property_type">Property Type</string>
+    <string name="no_of_rooms">No. of Rooms</string>
+    <string name="other_facilities">Other Facilities</string>
+    <string name="search">Search</string>
+
+    // Error String Resources
+    <string name="error_message">Something\nwent wrong\nat our end!</string>
+    <string name="retry">Retry</string>
 </resources>
