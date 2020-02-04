@@ -4,12 +4,11 @@ import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import com.aman.realstate.BuildConfig
-import com.aman.realstate.R
 import com.aman.realstate.ui.MainViewModel.Companion.TAG
-import com.google.android.material.chip.Chip
 
 fun Activity.showToast(message : String){
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -31,7 +30,7 @@ fun View.gone() {
     this.visibility = View.GONE
 }
 
-fun Chip.setIcon(name: String?) {
+fun AppCompatImageView.setImage(name: String?) {
     name?.let {
         val drawableName = when (it) {
             "apartment" -> "ic_apartment"
@@ -48,9 +47,7 @@ fun Chip.setIcon(name: String?) {
 
         try {
             val resourceID = resources.getIdentifier(drawableName, "drawable", BuildConfig.APPLICATION_ID)
-
-            this.chipIcon = getDrawable(this.context, resourceID)
-            this.setChipIconTintResource(R.drawable.chip_text)
+            this.setImageDrawable(getDrawable(this.context, resourceID))
         } catch (exception: Exception) {
             Log.e(TAG, "Failed to get resources ${exception.localizedMessage}")
         }

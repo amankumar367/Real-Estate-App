@@ -5,21 +5,25 @@ import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import com.aman.realstate.R
 import com.aman.realstate.data.repo.EStateRepoI
 import com.aman.realstate.databinding.ActivityMainBinding
 import com.aman.realstate.extensions.createFactory
-import com.aman.realstate.extensions.setIcon
 import com.aman.realstate.extensions.showToast
-import com.aman.realstate.room.entity.*
+import com.aman.realstate.room.entity.EState
+import com.aman.realstate.room.entity.Exclusion
+import com.aman.realstate.room.entity.Facility
+import com.aman.realstate.room.entity.Option
+import com.aman.realstate.ui.adapter.PropertyAdapter
+import com.aman.realstate.ui.adapter.RecyclerViewItemClickListener
 import com.aman.realstate.utils.ApiConstants
-import com.google.android.material.chip.Chip
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 
-class MainActivity : DaggerAppCompatActivity() {
+class MainActivity : DaggerAppCompatActivity(), RecyclerViewItemClickListener {
 
     @Inject
     lateinit var repo: EStateRepoI
@@ -28,7 +32,17 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var propertyAdapter: PropertyAdapter
+
+    private lateinit var roomAdapter: PropertyAdapter
+
+    private lateinit var otherFacilityAdapter: PropertyAdapter
+
+    private var disableExclusionList: List<Exclusion>? = null
+
     private var mState: EState? = null
+
+    private var isItemSelected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +52,7 @@ class MainActivity : DaggerAppCompatActivity() {
         setObserver()
         loadData()
         onClick()
-        chipOnCheckedListener()
+
     }
 
     private fun init() {
@@ -73,38 +87,6 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
-    private fun chipOnCheckedListener() {
-        cg_propery_type.setOnCheckedChangeListener { chipGroup, id ->
-            if (id > 0) {
-                val chip: Chip = chipGroup.findViewById(id)
-
-                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
-                setAlphaForExclusions(ids)
-                showToast(chip.text.toString())
-            }
-        }
-
-        cg_rooms.setOnCheckedChangeListener { chipGroup, id ->
-            if (id > 0) {
-                val chip: Chip = chipGroup.findViewById(id)
-
-                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
-                setAlphaForExclusions(ids)
-                showToast(chip.text.toString())
-            }
-        }
-
-        cg_other_facilities.setOnCheckedChangeListener { chipGroup, id ->
-            if (id > 0) {
-                val chip: Chip = chipGroup.findViewById(id)
-
-                val ids = getOptionIDAndFacilitiesID(chip.text.toString())
-                setAlphaForExclusions(ids)
-                showToast(chip.text.toString())
-            }
-        }
-    }
-
     private fun setAlphaForExclusions(ids: List<String>) {
         mState?.let {
             var foundList: List<Exclusion>? = null
@@ -123,54 +105,63 @@ class MainActivity : DaggerAppCompatActivity() {
                     return@forEach
                 }
             }
-            Log.d(TAG, "Searching ids: $ids & Found list : $foundList")
-        }
-    }
 
-    private fun getOptionIDAndFacilitiesID(optionName: String): List<String> {
-        val list = mutableListOf<String>()
-        mState?.let {
-            it.options.forEach { option ->
-                if (optionName == option.name) {
-                    list += option.facilityId!!
-                    list += option.id!!
-                    return@forEach
+            disableExclusionList = foundList?.let { list ->
+                list.filter { exclusion ->
+                    exclusion.facility_id.toString() != ids[0] && exclusion.options_id.toString() != ids[1]
                 }
             }
+
+            propertyAdapter.disableExclusionList = disableExclusionList
+            roomAdapter.disableExclusionList = disableExclusionList
+            otherFacilityAdapter.disableExclusionList = disableExclusionList
+
+            propertyAdapter.notifyDataSetChanged()
+            roomAdapter.notifyDataSetChanged()
+            otherFacilityAdapter.notifyDataSetChanged()
+            Log.d(TAG, "Searching ids: $ids & disableColorList list : $disableExclusionList")
         }
-        return list
     }
 
     private fun setData(data: EState) {
         mState = data
-        setOptions(data.options, data.facilities)
+        setPropertyOption(data.options, data.facilities)
+        setNoRoomOption(data.options, data.facilities)
+        setOtherOption(data.options, data.facilities)
     }
 
-    private fun setOptions(options: List<Option>, facility: List<Facility>) {
-        options.forEach {
-            val chip =
-                layoutInflater.inflate(R.layout.item_chip_category, null, false) as Chip
-            chip.setPadding(0, 0, 60, 0)
-
-            if (it.facilityId == facility[0].facilityId!!) {
-                chip.text = it.name
-                chip.setIcon(it.icon)
-                cg_propery_type.addView(chip)
-            }
-
-            if (it.facilityId == facility[1].facilityId!!) {
-                chip.text = it.name
-                chip.setIcon(it.icon)
-                cg_rooms.addView(chip)
-            }
-
-            if (it.facilityId == facility[2].facilityId!!) {
-                chip.text = it.name
-                chip.setIcon(it.icon)
-                cg_other_facilities.addView(chip)
-            }
-
+    private fun setPropertyOption(options: List<Option>, facility: List<Facility>) {
+        rv_propery_type.layoutManager = GridLayoutManager(this, 4)
+        val propertyOption = options.filter {
+            it.facilityId == facility[0].facilityId
         }
+
+        propertyAdapter = PropertyAdapter(propertyOption, null,this)
+        rv_propery_type.adapter = propertyAdapter
+    }
+
+    private fun setNoRoomOption(options: List<Option>, facilities: List<Facility>) {
+        rv_rooms.layoutManager = GridLayoutManager(this, 4)
+        val roomOptions = options.filter {
+            it.facilityId == facilities[1].facilityId
+        }
+
+        roomAdapter = PropertyAdapter(roomOptions, null, this)
+        rv_rooms.adapter = roomAdapter
+
+    }
+
+    private fun setOtherOption(options: List<Option>, facilities: List<Facility>) {
+        rv_other_facilities.layoutManager = GridLayoutManager(this, 4)
+        val otherOptions = options.filter {
+            it.facilityId == facilities[2].facilityId
+        }
+        otherFacilityAdapter = PropertyAdapter(otherOptions, null, this)
+        rv_other_facilities.adapter = otherFacilityAdapter
+    }
+
+    override fun onItemSelected(options: Option) {
+        setAlphaForExclusions(listOf(options.facilityId!!, options.id!!))
     }
 
     companion object {
