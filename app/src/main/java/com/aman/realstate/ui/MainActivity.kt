@@ -79,7 +79,9 @@ class MainActivity : DaggerAppCompatActivity(), RecyclerViewItemClickListener {
 
     private fun onClick() {
         btn_search.setOnClickListener {
-            showToast("Search successful")
+            if (isItemSelected) {
+                showToast("Search successful")
+            }
         }
 
         btn_retry.setOnClickListener {
@@ -160,8 +162,13 @@ class MainActivity : DaggerAppCompatActivity(), RecyclerViewItemClickListener {
         rv_other_facilities.adapter = otherFacilityAdapter
     }
 
-    override fun onItemSelected(options: Option) {
-        setAlphaForExclusions(listOf(options.facilityId!!, options.id!!))
+    override fun onItemSelected(options: Option, isClickable: Boolean) {
+        isItemSelected = true
+        if (isClickable) {
+            setAlphaForExclusions(listOf(options.facilityId!!, options.id!!))
+        } else {
+            showToast("Item: ${options.name} \ncannot be select with corresponding item")
+        }
     }
 
     companion object {
